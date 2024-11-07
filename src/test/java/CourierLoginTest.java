@@ -4,6 +4,8 @@ import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
 import org.junit.Test;
 import org.junit.After;
+
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
 public class CourierLoginTest {
@@ -33,14 +35,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Логин курьера
         Response loginResponse = courierSetup.loginCourier("pusher1", "1234");
 
         // Проверяем статус-код и id курьера
-        loginResponse.then().assertThat().statusCode(200);
+        loginResponse.then().assertThat().statusCode(SC_OK);
         String idString = loginResponse.jsonPath().getString("id");
         courierId = Integer.parseInt(idString);
         System.out.println("ID курьера после логина: " + courierId);
@@ -64,14 +66,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // логин без Логина (передаем пустую строку вместо логина)
         Response loginResponse = courierSetup.loginCourier("", "1234");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(400);
+        loginResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
         loginResponse.then().assertThat().body("message", equalTo("Недостаточно данных для входа"));
 
         // Получаем ID курьера для удаления
@@ -91,14 +93,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Пытаемся выполнить логин с логином, но без пароля
         Response loginResponse = courierSetup.loginCourier("pusher1", "");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(400);
+        loginResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
         loginResponse.then().assertThat().body("message", equalTo("Недостаточно данных для входа"));
 
         // Получаем ID курьера для удаления
@@ -117,14 +119,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Пытаемся выполнить логин с логином, но без пароля
         Response loginResponse = courierSetup.loginCourier("", "");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(400);
+        loginResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
         loginResponse.then().assertThat().body("message", equalTo("Недостаточно данных для входа"));
 
         // Получаем ID курьера для удаления
@@ -143,14 +145,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Пытаемся выполнить логин с неверным логином, и с верным паролем
         Response loginResponse = courierSetup.loginCourier("pusher12", "1234");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(404);
+        loginResponse.then().assertThat().statusCode(SC_NOT_FOUND);
         loginResponse.then().assertThat().body("message", equalTo("Учетная запись не найдена"));
 
         // Получаем ID курьера для удаления
@@ -169,14 +171,14 @@ public class CourierLoginTest {
         Response createResponse = courierSetup.createCourier(jsonBody);
 
         // Проверяем статус-код и содержимое ответа
-        createResponse.then().assertThat().statusCode(201);
+        createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Пытаемся выполнить логин с верным логином, и неверным паролем
         Response loginResponse = courierSetup.loginCourier("pusher1", "12343");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(404);
+        loginResponse.then().assertThat().statusCode(SC_NOT_FOUND);
         loginResponse.then().assertThat().body("message", equalTo("Учетная запись не найдена"));
 
         // Получаем ID курьера для удаления
@@ -193,7 +195,7 @@ public class CourierLoginTest {
         Response loginResponse = courierSetup.loginCourier("Jffddeerrd", "1234");
 
         // Проверяем статус-код и содержимое ответа
-        loginResponse.then().assertThat().statusCode(404);
+        loginResponse.then().assertThat().statusCode(SC_NOT_FOUND);
         loginResponse.then().assertThat().body("message", equalTo("Учетная запись не найдена"));
     }
 }

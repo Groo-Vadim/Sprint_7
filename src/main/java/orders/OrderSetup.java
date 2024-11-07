@@ -11,14 +11,28 @@ import static org.hamcrest.Matchers.not;
 public class OrderSetup {
     private static final String BASE_URL = "http://qa-scooter.praktikum-services.ru";
 
+    private static final String CREATE_ORDER_ENDPOINT = "/api/v1/orders";
+    private static final String CANCEL_ORDER_ENDPOINT = "/api/v1/orders/cancel";
+    private static final String GET_ORDER_ENDPOINT = "/api/v1/orders?limit=10&page=0&nearestStation=[\"110\"]";
+
     //Создание заказа
     public static Response createOrder(Order order) {
+        Gson gson = new Gson();
+        String orderJson = gson.toJson(order);
+
+        return given()
+                .header("Content-Type", "application/json")
+                .body(orderJson)
+                .post(BASE_URL + CREATE_ORDER_ENDPOINT);
+    }
+
+    /*public static Response createOrder(Order order) {
         Response response = given()
                 .header("Content-type", "application/json")
                 .body(order)
-                .post(BASE_URL + "/api/v1/orders");
+                .post(BASE_URL + CREATE_ORDER_ENDPOINT);
         return response;
-    }
+    }*/
 
     public static int checkTrackingNumber(Response response, int responseCode) {
         response.then().assertThat().body("track", not(0)).and().statusCode(responseCode);
@@ -31,20 +45,34 @@ public class OrderSetup {
     public static Response cancelOrder(int trackNumber) {
         String requestBody = "{ \"track\": " + trackNumber + " }";
 
+        return given()
+                .header("Content-Type", "application/json")
+                .body(requestBody)
+                .put(BASE_URL + CANCEL_ORDER_ENDPOINT);
+    }
+
+    /*public static Response cancelOrder(int trackNumber) {
+        String requestBody = "{ \"track\": " + trackNumber + " }";
+
         Response response = given()
                 .header("Content-type", "application/json")
                 .body(requestBody)
-                .put(BASE_URL + "/api/v1/orders/cancel");
+                .put(BASE_URL + CANCEL_ORDER_ENDPOINT);
         return response;
-    }
+    }*/
 
     //Получение списка заказов
     public static Response getOrders() {
+        return given()
+                .header("Content-Type", "application/json")
+                .get(BASE_URL + GET_ORDER_ENDPOINT);
+    }
+    /*public static Response getOrders() {
         Response response = given()
                 .header("Content-type", "application/json")
-                .get(BASE_URL + "/api/v1/orders?limit=10&page=0&nearestStation=[\"110\"]");
+                .get(BASE_URL + GET_ORDER_ENDPOINT);
         return response;
-    }
+    }*/
 
     //Проверка списка заказов в теле ответа
     public static void checkResponseBody(Response response) {
