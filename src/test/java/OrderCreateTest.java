@@ -58,7 +58,6 @@ public class OrderCreateTest {
         // Отмена заказа только если трек-номер не равен 0
         if (trackNumber != 0) {
             OrderSetup.cancelOrder(trackNumber);
-            //System.out.println("Order with track " + trackNumber + " has been canceled.");
         }
     }
 }

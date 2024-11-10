@@ -1,6 +1,6 @@
 package couriers;
 
-import com.google.gson.Gson;
+
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
@@ -14,30 +14,20 @@ public class CourierSetup {
     private static final String LOGIN_COURIER_ENDPOINT = "/api/v1/courier/login";
     private static final String DELETE_COURIER_ENDPOINT = "/api/v1/courier/";
 
-    private static final Gson gson = new Gson(); // Инициализация Gson
-
-    @Step("Метод для создания тела запроса для создания курьера")
-    public String createRequestBody(String login, String password, String firstName) {
-        Courier courier = new Courier(login, password, firstName);
-        return gson.toJson(courier);
-    }
-
     @Step("Метод для создания курьера")
-    public Response createCourier(String jsonBody) {
+    public Response createCourier(Courier courier) {
         return given()
                 .header("Content-Type", "application/json")
-                .body(jsonBody)
+                .body(courier)
                 .when()
                 .post(BASE_URL + CREATE_COURIER_ENDPOINT);
     }
 
     @Step("Метод для логина курьера")
-    public Response loginCourier(String login, String password) {
-        Courier loginRequest = new Courier(login, password);
-        String loginJsonBody = gson.toJson(loginRequest);
+    public Response loginCourier(Courier courier) {
         return given()
                 .header("Content-Type", "application/json")
-                .body(loginJsonBody)
+                .body(courier)
                 .when()
                 .post(BASE_URL + LOGIN_COURIER_ENDPOINT);
     }

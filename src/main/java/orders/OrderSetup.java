@@ -17,22 +17,11 @@ public class OrderSetup {
 
     //Создание заказа
     public static Response createOrder(Order order) {
-        Gson gson = new Gson();
-        String orderJson = gson.toJson(order);
-
         return given()
                 .header("Content-Type", "application/json")
-                .body(orderJson)
-                .post(BASE_URL + CREATE_ORDER_ENDPOINT);
-    }
-
-    /*public static Response createOrder(Order order) {
-        Response response = given()
-                .header("Content-type", "application/json")
                 .body(order)
                 .post(BASE_URL + CREATE_ORDER_ENDPOINT);
-        return response;
-    }*/
+    }
 
     public static int checkTrackingNumber(Response response, int responseCode) {
         response.then().assertThat().body("track", not(0)).and().statusCode(responseCode);
@@ -51,28 +40,12 @@ public class OrderSetup {
                 .put(BASE_URL + CANCEL_ORDER_ENDPOINT);
     }
 
-    /*public static Response cancelOrder(int trackNumber) {
-        String requestBody = "{ \"track\": " + trackNumber + " }";
-
-        Response response = given()
-                .header("Content-type", "application/json")
-                .body(requestBody)
-                .put(BASE_URL + CANCEL_ORDER_ENDPOINT);
-        return response;
-    }*/
-
     //Получение списка заказов
     public static Response getOrders() {
         return given()
                 .header("Content-Type", "application/json")
                 .get(BASE_URL + GET_ORDER_ENDPOINT);
     }
-    /*public static Response getOrders() {
-        Response response = given()
-                .header("Content-type", "application/json")
-                .get(BASE_URL + GET_ORDER_ENDPOINT);
-        return response;
-    }*/
 
     //Проверка списка заказов в теле ответа
     public static void checkResponseBody(Response response) {

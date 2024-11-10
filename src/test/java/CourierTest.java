@@ -1,3 +1,4 @@
+import couriers.Courier;
 import couriers.CourierSetup;
 import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
@@ -8,25 +9,23 @@ import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.Matchers.equalTo;
 
 public class CourierTest {
-
-    private int courierId = -1; // Инициализируем courierId значением -1
-    private final CourierSetup courierSetup = new CourierSetup(); // Создаем экземпляр CourierSetup
+    // Инициализируем courierId значением -1
+    private int courierId = -1;
+    // Создаем экземпляр CourierSetup
+    private final CourierSetup courierSetup = new CourierSetup();
 
     @Test
     @DisplayName("Test: courier can be created")
     public void createLoginAndDeleteCourier() {
         // Создаем тело запроса для создания курьера
-        String jsonBody = courierSetup.createRequestBody("expediter1", "1234", "saske");
-
-        // Отправка POST-запроса для создания курьера
-        Response createResponse = courierSetup.createCourier(jsonBody);
+        Response createResponse = courierSetup.createCourier(new Courier("expediter1", "1234", "saske"));
 
         // Проверяем статус-код и выводим сообщение об ошибке, если он не 201
         createResponse.then().assertThat().statusCode(SC_CREATED);
         createResponse.then().assertThat().body("ok", equalTo(true));
 
         // Логин курьера и получение ID
-        Response loginResponse = courierSetup.loginCourier("expediter1", "1234");
+        Response loginResponse = courierSetup.loginCourier(new Courier("expediter1", "1234"));
 
         // Проверяем статус-код логина
         loginResponse.then().assertThat().statusCode(SC_OK);
@@ -48,17 +47,14 @@ public class CourierTest {
     @DisplayName("Test: create two identical couriers")
     public void createDuplicateCourier() {
         // Данные для курьера
-        String jsonBody = courierSetup.createRequestBody("expediter1", "1234", "saske");
-
-        // Отправка POST-запроса для создания первого курьера
-        Response createResponse1 = courierSetup.createCourier(jsonBody);
+        Response createResponse1 = courierSetup.createCourier(new Courier("expediter1", "1234", "saske"));
 
         // Проверяем статус-код и содержимое ответа первого курьера
         createResponse1.then().assertThat().statusCode(SC_CREATED);
         createResponse1.then().assertThat().body("ok", equalTo(true));
 
         // Логин под данными первого курьера, чтобы убедиться, что он создан
-        Response loginResponse1 = courierSetup.loginCourier("expediter1", "1234");
+        Response loginResponse1 = courierSetup.loginCourier(new Courier("expediter1", "1234"));
 
         // Проверяем статус-код логина и id курьера
         loginResponse1.then().assertThat().statusCode(SC_OK);
@@ -67,8 +63,7 @@ public class CourierTest {
         System.out.println("ID первого курьера: " + courierId);
 
         // Пытаемся создать второго курьера с теми же данными
-        Response createResponse2 = courierSetup.createCourier(jsonBody);
-
+        Response createResponse2 = courierSetup.createCourier(new Courier("expediter1", "1234", "saske"));
         // Проверяем статус-код и ожидание ошибки
         createResponse2.then().assertThat().statusCode(SC_CONFLICT);
         createResponse2.then().assertThat().body("message", equalTo("Этот логин уже используется"));
@@ -83,10 +78,7 @@ public class CourierTest {
     @DisplayName("Test: create courier without Login")
     public void createCourierWithoutLogin() {
         // Создаем тело запроса без логина
-        String jsonBody = courierSetup.createRequestBody("", "1234", "saske");
-
-        // Отправка POST-запроса для создания курьера
-        Response createResponse = courierSetup.createCourier(jsonBody);
+        Response createResponse = courierSetup.createCourier(new Courier("", "1234", "saske"));
 
         // Проверяем статус-код и содержимое ответа
         createResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
@@ -97,10 +89,7 @@ public class CourierTest {
     @DisplayName("Test: create courier without Password")
     public void createCourierWithoutPassword() {
         // Создаем тело запроса без пароля
-        String jsonBody = courierSetup.createRequestBody("expediter1", "", "saske");
-
-        // Отправка POST-запроса для создания курьера
-        Response createResponse = courierSetup.createCourier(jsonBody);
+        Response createResponse = courierSetup.createCourier(new Courier("expediter1", "", "saske"));
 
         // Проверяем статус-код и содержимое ответа
         createResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
@@ -111,10 +100,7 @@ public class CourierTest {
     @DisplayName("Test: create courier without Login and Password")
     public void createCourierWithoutLoginAndPassword() {
         // Создаем тело запроса без логина и пароля
-        String jsonBody = courierSetup.createRequestBody("", "", "saske");
-
-        // Отправка POST-запроса для создания курьера
-        Response createResponse = courierSetup.createCourier(jsonBody);
+        Response createResponse = courierSetup.createCourier(new Courier("", "", "saske"));
 
         // Проверяем статус-код и содержимое ответа
         createResponse.then().assertThat().statusCode(SC_BAD_REQUEST);
